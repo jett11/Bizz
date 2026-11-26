@@ -7,6 +7,8 @@ import { RequireBusiness } from '@/routes/require-business'
 import { AppShell } from '@/components/layout/app-shell'
 import { DashboardPage } from '@/features/dashboard/dashboard-page'
 import { SettingsPage } from '@/features/settings/settings-page'
+import { CustomersListPage } from '@/features/customers/customers-list-page'
+import { CustomerProfilePage } from '@/features/customers/customer-profile-page'
 import { PlaceholderPage } from '@/components/placeholder-page'
 import { MODULE_ROUTES } from '@/components/layout/nav-config'
 
@@ -24,13 +26,17 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="notifications" element={<PlaceholderPage title="Notifications" />} />
-            {Object.entries(MODULE_ROUTES).map(([key, { path }]) => (
-              <Route
-                key={key}
-                path={path.replace('/app/', '')}
-                element={<PlaceholderPage title={key.replace(/_/g, ' ')} />}
-              />
-            ))}
+            <Route path="customers" element={<CustomersListPage />} />
+            <Route path="customers/:id" element={<CustomerProfilePage />} />
+            {Object.entries(MODULE_ROUTES)
+              .filter(([key]) => key !== 'customers')
+              .map(([key, { path }]) => (
+                <Route
+                  key={key}
+                  path={path.replace('/app/', '')}
+                  element={<PlaceholderPage title={key.replace(/_/g, ' ')} />}
+                />
+              ))}
           </Route>
         </Route>
 

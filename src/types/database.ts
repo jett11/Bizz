@@ -70,6 +70,21 @@ export interface IndustryModule {
   sort_order: number
 }
 
+export interface Customer {
+  id: string
+  business_id: string
+  name: string
+  phone: string | null
+  email: string | null
+  customer_type: string | null
+  address: string | null
+  notes: string | null
+  tags: string[]
+  archived_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 /** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
 export interface CreateBusinessArgs {
   p_name: string

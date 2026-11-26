@@ -30,7 +30,9 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
     { label: 'Notifications', path: '/app/notifications' },
     { label: 'Settings', path: '/app/settings' },
   ]
-  const current = allItems.find((i) => i.path === location.pathname) ?? { label: 'Bizloom' }
+  const current = allItems.find((i) => i.path === location.pathname)
+    ?? allItems.find((i) => i.path !== '/app' && location.pathname.startsWith(i.path + '/'))
+    ?? { label: 'Bizloom' }
 
   const initials = (profile?.full_name ?? user?.email ?? '?').slice(0, 2).toUpperCase()
 
