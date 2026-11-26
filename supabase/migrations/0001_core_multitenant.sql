@@ -104,12 +104,13 @@ create table business_settings (
 -- industry_modules: static catalog of modules available per business type
 -- ---------------------------------------------------------------------------
 create table industry_modules (
-  key text primary key,
+  key text not null,
   business_type business_type not null,
   label text not null,
   description text,
   is_core boolean not null default false,
-  sort_order int not null default 0
+  sort_order int not null default 0,
+  primary key (business_type, key)
 );
 
 -- ---------------------------------------------------------------------------
