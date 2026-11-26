@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { getErrorMessage } from '@/lib/get-error-message'
 import type { EmployeeInput, EmployeeRow } from '@/features/employees/employees-queries'
 
 const schema = z.object({
@@ -64,7 +65,7 @@ export function EmployeeFormDialog({
       await onSubmit(values)
       onOpenChange(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(getErrorMessage(err))
     }
   }
 

@@ -6,6 +6,7 @@ import { buildOperatingHours, type OnboardingData } from '@/features/onboarding/
 import { useAuth } from '@/providers/auth-provider'
 import { useBusiness } from '@/providers/business-provider'
 import { supabase } from '@/lib/supabase'
+import { getErrorMessage } from '@/lib/get-error-message'
 import type { Business } from '@/types/database'
 
 function slugify(name: string) {
@@ -72,7 +73,7 @@ export function ReviewStep({
       if (business) switchBusiness(business.id)
       onCreated()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create your workspace')
+      setError(getErrorMessage(err, 'Could not create your workspace'))
     } finally {
       setIsSubmitting(false)
     }

@@ -88,6 +88,24 @@ export interface Customer {
   updated_at: string
 }
 
+export interface Product {
+  id: string
+  business_id: string
+  name: string
+  sku: string | null
+  category: string | null
+  supplier: string | null
+  description: string | null
+  cost_price: number
+  selling_price: number
+  stock_quantity: number
+  reorder_level: number
+  unit: string
+  archived_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 /** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
 export interface CreateBusinessArgs {
   p_name: string

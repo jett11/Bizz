@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { getErrorMessage } from '@/lib/get-error-message'
 import type { Customer } from '@/types/database'
 import type { CustomerInput } from '@/features/customers/customers-queries'
 
@@ -67,7 +68,7 @@ export function CustomerFormDialog({
       await onSubmit(values)
       onOpenChange(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(getErrorMessage(err))
     }
   }
 
