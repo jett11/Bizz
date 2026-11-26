@@ -1,0 +1,77 @@
+-- Bizloom Phase 1: seed the industry module catalog shown during onboarding step 4.
+-- These are reference rows read by the client; later phases add the tables/UI
+-- behind each key. "is_core" modules are pre-checked and cannot be disabled.
+
+insert into industry_modules (key, business_type, label, description, is_core, sort_order) values
+  -- shared, every business type gets these
+  ('dashboard', 'retail', 'Dashboard', 'Revenue, orders, alerts and quick actions', true, 0),
+  ('customers', 'retail', 'Customers', 'Customer profiles, purchase history, notes', true, 1),
+  ('employees', 'retail', 'Employees', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'retail', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'retail', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'retail', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('products', 'retail', 'Products & Inventory', 'Products, variants, stock, suppliers', true, 10),
+  ('sales_orders', 'retail', 'Sales & Orders', 'Orders, quotations, invoices', true, 11),
+
+  ('dashboard', 'gym', 'Dashboard', 'Revenue, members, alerts and quick actions', true, 0),
+  ('customers', 'gym', 'Members', 'Member profiles, contact info, notes', true, 1),
+  ('employees', 'gym', 'Trainers & Staff', 'Trainer profiles, roles and permissions', false, 2),
+  ('finance', 'gym', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'gym', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'gym', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('memberships', 'gym', 'Membership Plans', 'Plans, renewals, expiry reminders', true, 10),
+  ('attendance', 'gym', 'Attendance & Check-ins', 'Member check-ins and attendance logs', true, 11),
+  ('trainers_workouts', 'gym', 'Workout Plans', 'Trainers and assigned workout plans', false, 12),
+
+  ('dashboard', 'restaurant', 'Dashboard', 'Revenue, orders, alerts and quick actions', true, 0),
+  ('customers', 'restaurant', 'Customers', 'Customer profiles and notes', false, 1),
+  ('employees', 'restaurant', 'Employees', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'restaurant', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'restaurant', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'restaurant', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('menu', 'restaurant', 'Menu Management', 'Menu items, categories, pricing', true, 10),
+  ('tables_orders', 'restaurant', 'Tables & Orders', 'Dine-in, takeaway, delivery, KOT', true, 11),
+  ('billing', 'restaurant', 'Billing', 'Bill generation and payments', true, 12),
+
+  ('dashboard', 'salon', 'Dashboard', 'Revenue, appointments, alerts and quick actions', true, 0),
+  ('customers', 'salon', 'Clients', 'Client profiles, history, notes', true, 1),
+  ('employees', 'salon', 'Staff', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'salon', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'salon', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'salon', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('services', 'salon', 'Services & Packages', 'Service catalogue, packages, memberships', true, 10),
+  ('appointments', 'salon', 'Appointments', 'Booking calendar and staff schedules', true, 11),
+
+  ('dashboard', 'coaching', 'Dashboard', 'Revenue, students, alerts and quick actions', true, 0),
+  ('customers', 'coaching', 'Students', 'Student profiles, contact info, notes', true, 1),
+  ('employees', 'coaching', 'Teachers', 'Teacher profiles, roles and permissions', false, 2),
+  ('finance', 'coaching', 'Finance', 'Fee tracking, dues, cash flow', true, 3),
+  ('marketing', 'coaching', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'coaching', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('courses_batches', 'coaching', 'Courses & Batches', 'Courses, batches, schedules', true, 10),
+  ('attendance', 'coaching', 'Attendance', 'Student attendance tracking', true, 11),
+
+  ('dashboard', 'wholesale', 'Dashboard', 'Revenue, orders, alerts and quick actions', true, 0),
+  ('customers', 'wholesale', 'Buyers', 'Buyer profiles, credit, purchase history', true, 1),
+  ('employees', 'wholesale', 'Employees', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'wholesale', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'wholesale', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'wholesale', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('bulk_pricing', 'wholesale', 'Bulk Pricing & Orders', 'Bulk pricing tiers and purchase orders', true, 10),
+  ('suppliers_inventory', 'wholesale', 'Suppliers & Inventory', 'Suppliers, stock, credit management', true, 11),
+
+  ('dashboard', 'service', 'Dashboard', 'Revenue, jobs, alerts and quick actions', true, 0),
+  ('customers', 'service', 'Customers', 'Customer profiles, enquiries, notes', true, 1),
+  ('employees', 'service', 'Employees', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'service', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'service', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'service', 'Reports', 'Revenue, profit and performance reports', true, 5),
+  ('service_catalogue', 'service', 'Service Catalogue', 'Services, enquiries, quotations', true, 10),
+  ('jobs', 'service', 'Job Management', 'Job status, appointments, payments', true, 11),
+
+  ('dashboard', 'other', 'Dashboard', 'Revenue, customers, alerts and quick actions', true, 0),
+  ('customers', 'other', 'Customers', 'Customer profiles, notes', true, 1),
+  ('employees', 'other', 'Employees', 'Staff profiles, roles and permissions', false, 2),
+  ('finance', 'other', 'Finance', 'Income, expenses, dues, cash flow', true, 3),
+  ('marketing', 'other', 'Marketing', 'Offers, announcements, campaigns', false, 4),
+  ('reports', 'other', 'Reports', 'Revenue, profit and performance reports', true, 5);

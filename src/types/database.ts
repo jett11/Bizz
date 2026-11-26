@@ -1,0 +1,86 @@
+export type BusinessType =
+  | 'retail'
+  | 'gym'
+  | 'restaurant'
+  | 'salon'
+  | 'coaching'
+  | 'wholesale'
+  | 'service'
+  | 'other'
+
+export type MembershipRole = 'owner' | 'admin' | 'manager' | 'staff'
+export type MembershipStatus = 'active' | 'invited' | 'suspended'
+
+export interface Profile {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OperatingHours {
+  [day: string]: { open: string; close: string; closed?: boolean } | undefined
+}
+
+export interface Business {
+  id: string
+  owner_id: string
+  name: string
+  slug: string
+  business_type: BusinessType
+  logo_url: string | null
+  contact_email: string | null
+  contact_phone: string | null
+  address: string | null
+  currency: string
+  timezone: string
+  operating_hours: OperatingHours
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface BusinessMembership {
+  id: string
+  business_id: string
+  user_id: string | null
+  invited_email: string | null
+  role: MembershipRole
+  permissions: Record<string, unknown>
+  status: MembershipStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface BusinessSettings {
+  business_id: string
+  enabled_modules: string[]
+  settings: Record<string, unknown>
+  updated_at: string
+}
+
+export interface IndustryModule {
+  key: string
+  business_type: BusinessType
+  label: string
+  description: string | null
+  is_core: boolean
+  sort_order: number
+}
+
+/** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
+export interface CreateBusinessArgs {
+  p_name: string
+  p_slug: string
+  p_business_type: BusinessType
+  p_currency?: string
+  p_timezone?: string
+  p_contact_email?: string | null
+  p_contact_phone?: string | null
+  p_address?: string | null
+  p_operating_hours?: OperatingHours
+  p_enabled_modules?: string[]
+  p_logo_url?: string | null
+}

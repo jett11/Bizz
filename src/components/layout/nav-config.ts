@@ -1,0 +1,51 @@
+import {
+  BadgeCheck,
+  BarChart3,
+  BookOpen,
+  Boxes,
+  CalendarCheck,
+  CalendarClock,
+  ClipboardList,
+  Dumbbell,
+  LayoutDashboard,
+  Megaphone,
+  Package,
+  Receipt,
+  ShoppingCart,
+  Sparkles,
+  Table,
+  Truck,
+  UserCog,
+  Users,
+  UtensilsCrossed,
+  Wallet,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react'
+
+export const MODULE_ROUTES: Record<string, { path: string; icon: LucideIcon }> = {
+  customers: { path: '/app/customers', icon: Users },
+  employees: { path: '/app/employees', icon: UserCog },
+  finance: { path: '/app/finance', icon: Wallet },
+  marketing: { path: '/app/marketing', icon: Megaphone },
+  reports: { path: '/app/reports', icon: BarChart3 },
+  products: { path: '/app/products', icon: Package },
+  sales_orders: { path: '/app/sales', icon: ShoppingCart },
+  memberships: { path: '/app/memberships', icon: BadgeCheck },
+  attendance: { path: '/app/attendance', icon: CalendarCheck },
+  trainers_workouts: { path: '/app/trainers', icon: Dumbbell },
+  menu: { path: '/app/menu', icon: UtensilsCrossed },
+  tables_orders: { path: '/app/tables', icon: Table },
+  billing: { path: '/app/billing', icon: Receipt },
+  services: { path: '/app/services', icon: Sparkles },
+  appointments: { path: '/app/appointments', icon: CalendarClock },
+  courses_batches: { path: '/app/courses', icon: BookOpen },
+  bulk_pricing: { path: '/app/bulk-pricing', icon: Boxes },
+  suppliers_inventory: { path: '/app/suppliers', icon: Truck },
+  service_catalogue: { path: '/app/catalogue', icon: Wrench },
+  jobs: { path: '/app/jobs', icon: ClipboardList },
+}
+
+export const OVERVIEW_NAV_ITEM = { label: 'Overview', path: '/app', icon: LayoutDashboard }
+
+export const SHARED_MODULE_KEYS = ['customers', 'employees', 'finance', 'marketing', 'reports']
