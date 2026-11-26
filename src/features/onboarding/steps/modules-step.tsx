@@ -87,7 +87,9 @@ export function ModulesStep({
         <Button type="button" variant="ghost" onClick={onBack}>
           Back
         </Button>
-        <Button onClick={onNext}>Continue</Button>
+        <Button onClick={onNext} disabled={isLoading}>
+          Continue
+        </Button>
       </div>
     </div>
   )

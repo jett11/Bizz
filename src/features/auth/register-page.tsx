@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { MailCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,6 +29,7 @@ export function RegisterPage() {
   const { signUpWithPassword } = useAuth()
   const navigate = useNavigate()
   const [serverError, setServerError] = useState<string | null>(null)
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState<string | null>(null)
 
   const {
     register,
@@ -37,12 +39,39 @@ export function RegisterPage() {
 
   async function onSubmit(values: FormValues) {
     setServerError(null)
-    const { error } = await signUpWithPassword(values.email, values.password, values.fullName)
+    const { error, needsEmailConfirmation } = await signUpWithPassword(
+      values.email,
+      values.password,
+      values.fullName,
+    )
     if (error) {
       setServerError(error)
       return
     }
+    if (needsEmailConfirmation) {
+      setAwaitingConfirmation(values.email)
+      return
+    }
     navigate('/onboarding', { replace: true })
+  }
+
+  if (awaitingConfirmation) {
+    return (
+      <AuthLayout title="Check your email" subtitle="You're almost there">
+        <div className="rounded-lg border border-border bg-muted/40 p-4">
+          <MailCheck className="size-6 text-primary" />
+          <p className="mt-3 text-sm text-foreground">
+            We've sent a confirmation link to <span className="font-medium">{awaitingConfirmation}</span>.
+            Click it, then come back and sign in to set up your business.
+          </p>
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          <Link to="/login" className="font-medium text-primary hover:underline">
+            Back to sign in
+          </Link>
+        </p>
+      </AuthLayout>
+    )
   }
 
   return (
