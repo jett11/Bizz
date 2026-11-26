@@ -9,6 +9,7 @@ import { DashboardPage } from '@/features/dashboard/dashboard-page'
 import { SettingsPage } from '@/features/settings/settings-page'
 import { CustomersListPage } from '@/features/customers/customers-list-page'
 import { CustomerProfilePage } from '@/features/customers/customer-profile-page'
+import { EmployeesListPage } from '@/features/employees/employees-list-page'
 import { PlaceholderPage } from '@/components/placeholder-page'
 import { MODULE_ROUTES } from '@/components/layout/nav-config'
 
@@ -28,8 +29,9 @@ function App() {
             <Route path="notifications" element={<PlaceholderPage title="Notifications" />} />
             <Route path="customers" element={<CustomersListPage />} />
             <Route path="customers/:id" element={<CustomerProfilePage />} />
+            <Route path="employees" element={<EmployeesListPage />} />
             {Object.entries(MODULE_ROUTES)
-              .filter(([key]) => key !== 'customers')
+              .filter(([key]) => key !== 'customers' && key !== 'employees')
               .map(([key, { path }]) => (
                 <Route
                   key={key}

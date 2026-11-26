@@ -50,6 +50,9 @@ export interface BusinessMembership {
   role: MembershipRole
   permissions: Record<string, unknown>
   status: MembershipStatus
+  department: string | null
+  phone: string | null
+  joining_date: string
   created_at: string
   updated_at: string
 }
