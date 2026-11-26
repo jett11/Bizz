@@ -106,6 +106,44 @@ export interface Product {
   updated_at: string
 }
 
+export type OrderStatus =
+  | 'draft'
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'ready'
+  | 'completed'
+  | 'cancelled'
+  | 'refunded'
+export type OrderPaymentStatus = 'unpaid' | 'partial' | 'paid' | 'refunded'
+
+export interface Order {
+  id: string
+  business_id: string
+  customer_id: string | null
+  order_number: string
+  status: OrderStatus
+  payment_status: OrderPaymentStatus
+  subtotal: number
+  discount: number
+  tax: number
+  total: number
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderItem {
+  id: string
+  order_id: string
+  product_id: string | null
+  product_name: string
+  unit_price: number
+  quantity: number
+  line_total: number
+  created_at: string
+}
+
 /** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
 export interface CreateBusinessArgs {
   p_name: string

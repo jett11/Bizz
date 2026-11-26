@@ -11,6 +11,9 @@ import { CustomersListPage } from '@/features/customers/customers-list-page'
 import { CustomerProfilePage } from '@/features/customers/customer-profile-page'
 import { EmployeesListPage } from '@/features/employees/employees-list-page'
 import { ProductsListPage } from '@/features/products/products-list-page'
+import { OrdersListPage } from '@/features/orders/orders-list-page'
+import { NewOrderPage } from '@/features/orders/new-order-page'
+import { OrderDetailPage } from '@/features/orders/order-detail-page'
 import { PlaceholderPage } from '@/components/placeholder-page'
 import { MODULE_ROUTES } from '@/components/layout/nav-config'
 
@@ -32,8 +35,14 @@ function App() {
             <Route path="customers/:id" element={<CustomerProfilePage />} />
             <Route path="employees" element={<EmployeesListPage />} />
             <Route path="products" element={<ProductsListPage />} />
+            <Route path="sales" element={<OrdersListPage />} />
+            <Route path="sales/new" element={<NewOrderPage />} />
+            <Route path="sales/:id" element={<OrderDetailPage />} />
             {Object.entries(MODULE_ROUTES)
-              .filter(([key]) => key !== 'customers' && key !== 'employees' && key !== 'products')
+              .filter(
+                ([key]) =>
+                  !['customers', 'employees', 'products', 'sales_orders'].includes(key),
+              )
               .map(([key, { path }]) => (
                 <Route
                   key={key}
