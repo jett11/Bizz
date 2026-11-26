@@ -8,7 +8,12 @@ import { StatCard } from '@/features/dashboard/stat-card'
 import { InviteTeammateDialog } from '@/features/dashboard/invite-teammate-dialog'
 import { useBusiness } from '@/providers/business-provider'
 import { supabase } from '@/lib/supabase'
+import { useFinanceSummary } from '@/features/finance/finance-queries'
 import type { Profile } from '@/types/database'
+
+function formatMoney(n: number) {
+  return `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
 
 interface TeamRow {
   id: string
@@ -20,6 +25,7 @@ interface TeamRow {
 
 export function DashboardPage() {
   const { currentBusiness, currentRole } = useBusiness()
+  const { data: summary, isLoading: summaryLoading } = useFinanceSummary(currentBusiness?.id)
 
   const { data: team, isLoading } = useQuery({
     queryKey: ['team-members', currentBusiness?.id],
@@ -72,24 +78,24 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Revenue"
-          value="—"
+          value={summaryLoading ? '…' : formatMoney(summary?.revenue ?? 0)}
           icon={Banknote}
-          hint="No sales recorded yet"
-          muted
+          hint={summary?.revenue ? `${summary.orderCount} orders counted` : 'No sales recorded yet'}
+          muted={!summary?.revenue}
         />
         <StatCard
           label="Expenses"
-          value="—"
+          value={summaryLoading ? '…' : formatMoney(summary?.expenses ?? 0)}
           icon={Receipt}
-          hint="No expenses recorded yet"
-          muted
+          hint={summary?.expenses ? 'From the Finance module' : 'No expenses recorded yet'}
+          muted={!summary?.expenses}
         />
         <StatCard
           label="Orders"
-          value="—"
+          value={summaryLoading ? '…' : String(summary?.orderCount ?? 0)}
           icon={ShoppingCart}
-          hint="No orders recorded yet"
-          muted
+          hint={summary?.orderCount ? `${formatMoney(summary.pendingPayments)} pending payment` : 'No orders recorded yet'}
+          muted={!summary?.orderCount}
         />
         <StatCard
           label="Team members"

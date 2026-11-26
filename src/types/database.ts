@@ -144,6 +144,19 @@ export interface OrderItem {
   created_at: string
 }
 
+export interface Expense {
+  id: string
+  business_id: string
+  expense_date: string
+  category: string | null
+  vendor: string | null
+  description: string | null
+  amount: number
+  payment_method: string | null
+  created_at: string
+  updated_at: string
+}
+
 /** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
 export interface CreateBusinessArgs {
   p_name: string
