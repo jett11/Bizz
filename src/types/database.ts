@@ -157,6 +157,17 @@ export interface Expense {
   updated_at: string
 }
 
+export interface Notification {
+  id: string
+  business_id: string
+  user_id: string | null
+  type: string
+  title: string
+  body: string | null
+  link: string | null
+  created_at: string
+}
+
 /** Args for the `create_business` RPC (see supabase/migrations/0001_core_multitenant.sql). */
 export interface CreateBusinessArgs {
   p_name: string

@@ -13,13 +13,19 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useAuth } from '@/providers/auth-provider'
 import { useTheme } from '@/providers/theme-provider'
+import { useBusiness } from '@/providers/business-provider'
 import { useNavItems } from '@/components/layout/use-nav-items'
 import { OVERVIEW_NAV_ITEM } from '@/components/layout/nav-config'
+import { useNotifications, useRecentNotificationCount } from '@/features/notifications/notifications-queries'
+import { NotificationItem } from '@/features/notifications/notification-item'
 
 export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const { profile, user, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { currentBusiness } = useBusiness()
   const { sharedItems, industryItems } = useNavItems()
+  const { data: notifications } = useNotifications(currentBusiness?.id)
+  const recentCount = useRecentNotificationCount(currentBusiness?.id)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -59,13 +65,34 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
             <Bell className="size-5" />
+            {recentCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                {recentCount > 9 ? '9+' : recentCount}
+              </span>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent align="end" className="w-80">
-          <p className="text-sm font-medium">Notifications</p>
-          <p className="mt-2 text-sm text-muted-foreground">You're all caught up.</p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Notifications</p>
+            <button
+              type="button"
+              className="text-xs text-primary hover:underline"
+              onClick={() => navigate('/app/notifications')}
+            >
+              View all
+            </button>
+          </div>
+          <div className="mt-2 space-y-1">
+            {(notifications ?? []).length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">You're all caught up.</p>
+            )}
+            {(notifications ?? []).slice(0, 6).map((n) => (
+              <NotificationItem key={n.id} notification={n} onNavigate={navigate} />
+            ))}
+          </div>
         </PopoverContent>
       </Popover>
 

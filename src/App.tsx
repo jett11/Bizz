@@ -16,6 +16,7 @@ import { NewOrderPage } from '@/features/orders/new-order-page'
 import { OrderDetailPage } from '@/features/orders/order-detail-page'
 import { FinancePage } from '@/features/finance/finance-page'
 import { ReportsPage } from '@/features/reports/reports-page'
+import { NotificationsPage } from '@/features/notifications/notifications-page'
 import { PlaceholderPage } from '@/components/placeholder-page'
 import { MODULE_ROUTES } from '@/components/layout/nav-config'
 
@@ -32,7 +33,7 @@ function App() {
           <Route path="/app" element={<AppShell />}>
             <Route index element={<DashboardPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="notifications" element={<PlaceholderPage title="Notifications" />} />
+            <Route path="notifications" element={<NotificationsPage />} />
             <Route path="customers" element={<CustomersListPage />} />
             <Route path="customers/:id" element={<CustomerProfilePage />} />
             <Route path="employees" element={<EmployeesListPage />} />
