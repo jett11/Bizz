@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Bell, LogOut, Menu, Search, Settings, User } from 'lucide-react'
+import { Bell, LogOut, Menu, Moon, Search, Settings, Sun, User } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,18 +12,25 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useAuth } from '@/providers/auth-provider'
+import { useTheme } from '@/providers/theme-provider'
 import { useNavItems } from '@/components/layout/use-nav-items'
 import { OVERVIEW_NAV_ITEM } from '@/components/layout/nav-config'
 
 export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const { profile, user, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const { sharedItems, industryItems } = useNavItems()
   const location = useLocation()
   const navigate = useNavigate()
 
-  const allItems = [OVERVIEW_NAV_ITEM, ...sharedItems, ...industryItems]
-  const current =
-    allItems.find((i) => i.path === location.pathname) ?? { label: 'Bizloom' as const }
+  const allItems = [
+    OVERVIEW_NAV_ITEM,
+    ...sharedItems,
+    ...industryItems,
+    { label: 'Notifications', path: '/app/notifications' },
+    { label: 'Settings', path: '/app/settings' },
+  ]
+  const current = allItems.find((i) => i.path === location.pathname) ?? { label: 'Bizloom' }
 
   const initials = (profile?.full_name ?? user?.email ?? '?').slice(0, 2).toUpperCase()
 
@@ -43,6 +50,10 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
         <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input placeholder="Search…" className="pl-8" />
       </div>
+
+      <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+        {theme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
+      </Button>
 
       <Popover>
         <PopoverTrigger asChild>

@@ -25,14 +25,20 @@ export function AuthLayout({
           <div className="mt-8">{children}</div>
         </div>
       </div>
-      <div className="relative hidden flex-1 bg-sidebar lg:block">
+      <div className="relative hidden flex-1 overflow-hidden bg-sidebar lg:block">
+        <div
+          className="absolute -right-32 -top-32 size-[32rem] rounded-full opacity-30 blur-3xl"
+          style={{ background: 'radial-gradient(circle, var(--primary), transparent 70%)' }}
+        />
+        <div
+          className="absolute -bottom-40 -left-20 size-[28rem] rounded-full opacity-20 blur-3xl"
+          style={{ background: 'radial-gradient(circle, var(--chart-3), transparent 70%)' }}
+        />
         <div className="absolute inset-0 flex flex-col justify-center gap-6 p-16">
           <p className="text-3xl font-semibold leading-tight text-sidebar-foreground">
-            One platform.
+            Every business.
             <br />
-            Any business.
-            <br />
-            Complete control.
+            One powerful platform.
           </p>
           <p className="max-w-md text-sm text-sidebar-foreground/70">
             Manage customers, employees, finance and growth for every business you run, from a

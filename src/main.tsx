@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from '@/providers/auth-provider'
 import { BusinessProvider } from '@/providers/business-provider'
+import { ThemeProvider } from '@/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
@@ -17,14 +18,16 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <BusinessProvider>
-            <TooltipProvider>
-              <App />
-              <Toaster />
-            </TooltipProvider>
-          </BusinessProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <BusinessProvider>
+              <TooltipProvider>
+                <App />
+                <Toaster />
+              </TooltipProvider>
+            </BusinessProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,
