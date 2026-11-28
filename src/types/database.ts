@@ -106,6 +106,33 @@ export interface Product {
   updated_at: string
 }
 
+export interface MenuItem {
+  id: string
+  business_id: string
+  name: string
+  category: string | null
+  description: string | null
+  price: number
+  is_available: boolean
+  archived_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TableStatus = 'available' | 'occupied' | 'reserved' | 'cleaning'
+
+export interface RestaurantTable {
+  id: string
+  business_id: string
+  table_number: string
+  capacity: number
+  status: TableStatus
+  created_at: string
+  updated_at: string
+}
+
+export type OrderType = 'retail' | 'dine_in' | 'takeaway' | 'delivery'
+
 export type OrderStatus =
   | 'draft'
   | 'pending'
@@ -129,6 +156,8 @@ export interface Order {
   tax: number
   total: number
   notes: string | null
+  order_type: OrderType
+  table_id: string | null
   created_at: string
   updated_at: string
 }
@@ -137,6 +166,7 @@ export interface OrderItem {
   id: string
   order_id: string
   product_id: string | null
+  menu_item_id: string | null
   product_name: string
   unit_price: number
   quantity: number

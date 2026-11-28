@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -42,7 +43,14 @@ export function OrderDetailPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">{order.order_number}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold tracking-tight">{order.order_number}</h1>
+            {order.order_type !== 'retail' && (
+              <Badge variant="outline" className="capitalize">
+                {order.order_type.replace('_', ' ')}
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
             {format(new Date(order.created_at), 'd MMM yyyy, h:mm a')}
           </p>
@@ -53,7 +61,7 @@ export function OrderDetailPage() {
             disabled={!canManage}
             onValueChange={(v) =>
               updateStatus.mutate(
-                { id: order.id, status: v as OrderStatus },
+                { id: order.id, status: v as OrderStatus, tableId: order.table_id },
                 { onSuccess: () => toast.success('Status updated'), onError: (e) => toast.error(e.message) },
               )
             }

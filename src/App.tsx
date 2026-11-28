@@ -17,6 +17,9 @@ import { OrderDetailPage } from '@/features/orders/order-detail-page'
 import { FinancePage } from '@/features/finance/finance-page'
 import { ReportsPage } from '@/features/reports/reports-page'
 import { NotificationsPage } from '@/features/notifications/notifications-page'
+import { MenuItemsPage } from '@/features/restaurant/menu-items-page'
+import { TablesPage } from '@/features/restaurant/tables-page'
+import { BillingPage } from '@/features/restaurant/billing-page'
 import { PlaceholderPage } from '@/components/placeholder-page'
 import { MODULE_ROUTES } from '@/components/layout/nav-config'
 
@@ -43,6 +46,9 @@ function App() {
             <Route path="sales/:id" element={<OrderDetailPage />} />
             <Route path="finance" element={<FinancePage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="menu" element={<MenuItemsPage />} />
+            <Route path="tables" element={<TablesPage />} />
+            <Route path="billing" element={<BillingPage />} />
             {Object.entries(MODULE_ROUTES)
               .filter(
                 ([key]) =>
@@ -53,6 +59,9 @@ function App() {
                     'sales_orders',
                     'finance',
                     'reports',
+                    'menu',
+                    'tables_orders',
+                    'billing',
                   ].includes(key),
               )
               .map(([key, { path }]) => (

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { Order, OrderItem, OrderPaymentStatus, OrderStatus } from '@/types/database'
+import type { Order, OrderItem, OrderPaymentStatus, OrderStatus, OrderType } from '@/types/database'
 
 function toNumbers(order: Record<string, unknown>): Order {
   return {
@@ -52,12 +52,18 @@ export function useOrder(id: string | undefined) {
   })
 }
 
+export type OrderLineItemInput =
+  | { productId: string; quantity: number }
+  | { menuItemId: string; quantity: number }
+
 export interface CreateOrderInput {
   customerId: string | null
-  items: { productId: string; quantity: number }[]
+  items: OrderLineItemInput[]
   discount: number
   tax: number
   notes: string
+  orderType?: OrderType
+  tableId?: string | null
 }
 
 export function useCreateOrder(businessId: string) {
@@ -68,10 +74,16 @@ export function useCreateOrder(businessId: string) {
         .rpc('create_order', {
           p_business_id: businessId,
           p_customer_id: input.customerId,
-          p_items: input.items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+          p_items: input.items.map((i) =>
+            'menuItemId' in i
+              ? { menu_item_id: i.menuItemId, quantity: i.quantity }
+              : { product_id: i.productId, quantity: i.quantity },
+          ),
           p_discount: input.discount,
           p_tax: input.tax,
           p_notes: input.notes || null,
+          p_order_type: input.orderType ?? 'retail',
+          p_table_id: input.tableId ?? null,
         })
         .single()
       if (error) throw error
@@ -80,9 +92,12 @@ export function useCreateOrder(businessId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['orders', businessId] })
       void queryClient.invalidateQueries({ queryKey: ['products', businessId] })
+      void queryClient.invalidateQueries({ queryKey: ['restaurant-tables', businessId] })
     },
   })
 }
+
+const TERMINAL_STATUSES: OrderStatus[] = ['completed', 'cancelled', 'refunded']
 
 export function useUpdateOrderStatus(businessId: string) {
   const queryClient = useQueryClient()
@@ -91,20 +106,27 @@ export function useUpdateOrderStatus(businessId: string) {
       id,
       status,
       paymentStatus,
+      tableId,
     }: {
       id: string
       status?: OrderStatus
       paymentStatus?: OrderPaymentStatus
+      tableId?: string | null
     }) => {
       const patch: Record<string, string> = {}
       if (status) patch.status = status
       if (paymentStatus) patch.payment_status = paymentStatus
       const { error } = await supabase.from('orders').update(patch).eq('id', id)
       if (error) throw error
+
+      if (status && TERMINAL_STATUSES.includes(status) && tableId) {
+        await supabase.from('restaurant_tables').update({ status: 'available' }).eq('id', tableId)
+      }
     },
     onSuccess: (_d, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['orders', businessId] })
       void queryClient.invalidateQueries({ queryKey: ['order', variables.id] })
+      void queryClient.invalidateQueries({ queryKey: ['restaurant-tables', businessId] })
     },
   })
 }

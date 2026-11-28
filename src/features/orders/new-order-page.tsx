@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,14 +19,19 @@ import { useBusiness } from '@/providers/business-provider'
 import { useCustomers } from '@/features/customers/customers-queries'
 import { useCustomerLabel } from '@/features/customers/use-customer-label'
 import { useProducts } from '@/features/products/products-queries'
-import { useCreateOrder } from '@/features/orders/orders-queries'
+import { useMenuItems } from '@/features/restaurant/menu-queries'
+import { useRestaurantTables } from '@/features/restaurant/tables-queries'
+import { useCreateOrder, type OrderLineItemInput } from '@/features/orders/orders-queries'
 import { getErrorMessage } from '@/lib/get-error-message'
+import type { OrderType } from '@/types/database'
 
 interface LineItem {
-  productId: string
+  key: string
+  catalogId: string
+  kind: 'product' | 'menuItem'
   name: string
   unitPrice: number
-  stock: number
+  stock: number | null
   quantity: number
 }
 
@@ -36,41 +41,67 @@ function formatMoney(n: number) {
 
 export function NewOrderPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { currentBusiness } = useBusiness()
+  const isRestaurant = currentBusiness?.business_type === 'restaurant'
   const customerLabel = useCustomerLabel()
   const { data: customers } = useCustomers(currentBusiness?.id, false)
   const { data: products } = useProducts(currentBusiness?.id, false)
+  const { data: menuItems } = useMenuItems(currentBusiness?.id, false)
+  const { data: tables } = useRestaurantTables(currentBusiness?.id)
   const createOrder = useCreateOrder(currentBusiness?.id ?? '')
 
   const [customerId, setCustomerId] = useState<string>('none')
+  const [orderType, setOrderType] = useState<OrderType>(
+    isRestaurant ? (searchParams.get('tableId') ? 'dine_in' : 'takeaway') : 'retail',
+  )
+  const [tableId, setTableId] = useState<string>(searchParams.get('tableId') ?? 'none')
   const [items, setItems] = useState<LineItem[]>([])
-  const [selectedProductId, setSelectedProductId] = useState<string>('')
+  const [selectedCatalogId, setSelectedCatalogId] = useState<string>('')
   const [discount, setDiscount] = useState('0')
   const [tax, setTax] = useState('0')
   const [notes, setNotes] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const availableProducts = (products ?? []).filter(
-    (p) => !items.some((i) => i.productId === p.id),
+  const availableMenuItems = (menuItems ?? []).filter(
+    (m) => m.is_available && !items.some((i) => i.catalogId === m.id),
   )
+  const availableProducts = (products ?? []).filter((p) => !items.some((i) => i.catalogId === p.id))
 
   function addItem() {
-    const product = (products ?? []).find((p) => p.id === selectedProductId)
-    if (!product) return
-    setItems((prev) => [
-      ...prev,
-      { productId: product.id, name: product.name, unitPrice: product.selling_price, stock: product.stock_quantity, quantity: 1 },
-    ])
-    setSelectedProductId('')
+    if (isRestaurant) {
+      const item = (menuItems ?? []).find((m) => m.id === selectedCatalogId)
+      if (!item) return
+      setItems((prev) => [
+        ...prev,
+        { key: item.id, catalogId: item.id, kind: 'menuItem', name: item.name, unitPrice: item.price, stock: null, quantity: 1 },
+      ])
+    } else {
+      const product = (products ?? []).find((p) => p.id === selectedCatalogId)
+      if (!product) return
+      setItems((prev) => [
+        ...prev,
+        {
+          key: product.id,
+          catalogId: product.id,
+          kind: 'product',
+          name: product.name,
+          unitPrice: product.selling_price,
+          stock: product.stock_quantity,
+          quantity: 1,
+        },
+      ])
+    }
+    setSelectedCatalogId('')
   }
 
-  function updateQuantity(productId: string, quantity: number) {
-    setItems((prev) => prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)))
+  function updateQuantity(key: string, quantity: number) {
+    setItems((prev) => prev.map((i) => (i.key === key ? { ...i, quantity } : i)))
   }
 
-  function removeItem(productId: string) {
-    setItems((prev) => prev.filter((i) => i.productId !== productId))
+  function removeItem(key: string) {
+    setItems((prev) => prev.filter((i) => i.key !== key))
   }
 
   const subtotal = useMemo(
@@ -87,19 +118,26 @@ export function NewOrderPage() {
       setError('Add at least one item')
       return
     }
-    const overStock = items.find((i) => i.quantity > i.stock)
+    const overStock = items.find((i) => i.stock !== null && i.quantity > i.stock)
     if (overStock) {
       setError(`Not enough stock for ${overStock.name} (have ${overStock.stock})`)
       return
     }
     setIsSubmitting(true)
     try {
+      const lineItems: OrderLineItemInput[] = items.map((i) =>
+        i.kind === 'menuItem'
+          ? { menuItemId: i.catalogId, quantity: i.quantity }
+          : { productId: i.catalogId, quantity: i.quantity },
+      )
       const order = await createOrder.mutateAsync({
         customerId: customerId === 'none' ? null : customerId,
-        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        items: lineItems,
         discount: discountNum,
         tax: taxNum,
         notes,
+        orderType,
+        tableId: orderType === 'dine_in' && tableId !== 'none' ? tableId : null,
       })
       toast.success(`Order ${order.order_number} created`)
       navigate(`/app/sales/${order.id}`)
@@ -121,6 +159,47 @@ export function NewOrderPage() {
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {isRestaurant && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Order type</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-end gap-4">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={orderType} onValueChange={(v) => setOrderType(v as OrderType)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dine_in">Dine-in</SelectItem>
+                  <SelectItem value="takeaway">Takeaway</SelectItem>
+                  <SelectItem value="delivery">Delivery</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {orderType === 'dine_in' && (
+              <div className="space-y-2">
+                <Label>Table</Label>
+                <Select value={tableId} onValueChange={setTableId}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Select a table…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No table</SelectItem>
+                    {(tables ?? []).map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        Table {t.table_number}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       <Card>
@@ -150,19 +229,25 @@ export function NewOrderPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+            <Select value={selectedCatalogId} onValueChange={setSelectedCatalogId}>
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select a product…" />
+                <SelectValue placeholder={isRestaurant ? 'Select a menu item…' : 'Select a product…'} />
               </SelectTrigger>
               <SelectContent>
-                {availableProducts.map((p) => (
-                  <SelectItem key={p.id} value={p.id} disabled={p.stock_quantity <= 0}>
-                    {p.name} — {formatMoney(p.selling_price)} ({p.stock_quantity} in stock)
-                  </SelectItem>
-                ))}
+                {isRestaurant
+                  ? availableMenuItems.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name} — {formatMoney(m.price)}
+                      </SelectItem>
+                    ))
+                  : availableProducts.map((p) => (
+                      <SelectItem key={p.id} value={p.id} disabled={p.stock_quantity <= 0}>
+                        {p.name} — {formatMoney(p.selling_price)} ({p.stock_quantity} in stock)
+                      </SelectItem>
+                    ))}
               </SelectContent>
             </Select>
-            <Button type="button" variant="outline" onClick={addItem} disabled={!selectedProductId}>
+            <Button type="button" variant="outline" onClick={addItem} disabled={!selectedCatalogId}>
               <Plus className="size-4" /> Add
             </Button>
           </div>
@@ -172,33 +257,26 @@ export function NewOrderPage() {
           ) : (
             <div className="space-y-2">
               {items.map((item) => (
-                <div
-                  key={item.productId}
-                  className="flex items-center gap-3 rounded-lg border border-border p-3"
-                >
+                <div key={item.key} className="flex items-center gap-3 rounded-lg border border-border p-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{item.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatMoney(item.unitPrice)} each · {item.stock} in stock
+                      {formatMoney(item.unitPrice)} each
+                      {item.stock !== null && ` · ${item.stock} in stock`}
                     </p>
                   </div>
                   <Input
                     type="number"
                     min={1}
-                    max={item.stock}
+                    max={item.stock ?? undefined}
                     value={item.quantity}
-                    onChange={(e) => updateQuantity(item.productId, Number(e.target.value))}
+                    onChange={(e) => updateQuantity(item.key, Number(e.target.value))}
                     className="w-20"
                   />
                   <p className="w-24 text-right text-sm font-medium">
                     {formatMoney(item.unitPrice * item.quantity)}
                   </p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeItem(item.productId)}
-                  >
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(item.key)}>
                     <Trash2 className="size-4" />
                   </Button>
                 </div>
